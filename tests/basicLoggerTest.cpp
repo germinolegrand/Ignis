@@ -1,9 +1,9 @@
-#include "../log_system/toString.h"
+#include "../log_system/basicLogger.h"
 #include <iostream>
 #include <vector>
 #include <unordered_map>
 
-//g++ -Wall -std=c++14 toStringTest.cpp -o testToString 
+//g++ -Wall -std=c++14 basicLoggerTest.cpp -o testBasicLogger
 
 using namespace ign;
 
@@ -35,13 +35,13 @@ int main()
 	//tuple
 	auto test_tuple = std::make_tuple("test", 15, true, "tuple test ?");	
 
-	std::cout << log::toString(test) << std::endl;
-	std::cout << log::toString(40.1547f) << std::endl;
-	std::cout << log::toString(test2) << std::endl;
-	std::cout << log::toString(tab) << std::endl;
-	std::cout << log::toString(tab_first) << std::endl;
-	std::cout << log::toString(vect) << std::endl;
-	std::cout << log::toString(test_map) << std::endl;
-	std::cout << log::toString(test_tuple) << std::endl;
+	ign::log::basicLogger dbg(5);
+	dbg.setOutputFile("dbg.log");
+
+	dbg(test, 40.1547f, tab, tab_first, vect, test_map, test_tuple);
+
+	for (int i = 0; i < 12; ++i)
+		dbg("attempt :", i);
+
 	return 0;
 }

@@ -76,10 +76,15 @@ std::string getName(const T& obj, bool getRealName = true)
 ////////////////////////////////////////////
 
 /** string **/
-template<class T, std::enable_if_t<std::is_same<T, std::string>::value>* = nullptr>
-std::string toString(const T& t)
+std::string toString(const std::string& t)
 {
 	return t;
+}
+
+/** C style strings **/
+std::string toString(const char* t)
+{
+	return std::string(t);
 }
 
 /** arithmetic **/
@@ -93,7 +98,7 @@ std::string toString(const T& t)
 template<class T, std::enable_if_t<std::is_same<T, bool>::value>* = nullptr>
 std::string toString(const T& t)
 {
-	return t ? std::string{"True"} : std::string{"False"};
+	return t ? std::string{"true"} : std::string{"false"};
 }
 
 /** pair **/
@@ -118,7 +123,7 @@ std::string toString(const T& t)
 template<class T, std::enable_if_t<std::is_array<T>::value>* = nullptr>
 std::string toString(const T& t)
 {
-	std::string res = "[";
+	std::string res = getName(t) + "[";
 
 	for (const auto& elem : t)
 		res += toString(elem) + ", ";
