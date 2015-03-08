@@ -17,6 +17,7 @@ public :
 	bool print_term = true; //if activated, will print in the terminal each time you call () operator
 	std::string prefix = "[log]";
 	std::string separator = " ";
+	std::ostream& m_std_stream = std::cout;
 
 protected :	
 	std::string m_output_file; 
