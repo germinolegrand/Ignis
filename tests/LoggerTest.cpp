@@ -13,13 +13,13 @@ class hasToString
 	std::string toString() const{ return std::string("It works"); };
 };
 
-class testClass 
+class testClass
 {
 	public:
 	int test = 5;
 };
 
-int main() 
+int main()
 {
 	std::vector<bool> vect = {true, true, false, true, false, true};
 	std::unordered_map<std::string, int> test_map;
@@ -29,11 +29,11 @@ int main()
 
 	int tab[5] = {1, 2, 3, 4, 5};
 	int* tab_first = &tab[0];
-	hasToString test;	
+	hasToString test;
 	testClass test2;
 
 	//tuple
-	auto test_tuple = std::make_tuple("test", 15, true, "tuple test ?");	
+	auto test_tuple = std::make_tuple("test", 15, true, "tuple test ?", test_map, "fin");
 
 	ign::log::Logger dbg(5); //set buffer size
 	dbg.configure(true /*print in terminal*/, "[dbg]" /*prefix*/, " " /*separator*/, false /*print time*/);

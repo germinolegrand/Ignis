@@ -25,12 +25,12 @@ public:
 };
 
 // see : http://stackoverflow.com/questions/4347921/sfinae-compiler-troubles
-template <typename T> 
+template <typename T>
 class is_container
 {
 	// Is.
 	template <typename U>
-	static char test(U* u, 
+	static char test(U* u,
 			int (*b)[sizeof(typename U::const_iterator()==((U*)0)->begin())] = 0,
 			int (*e)[sizeof(typename U::const_iterator()==((U*)0)->end())] = 0);
 	// Is not.
@@ -52,15 +52,14 @@ std::string getName(const T& obj, bool getRealName = true)
 			char *realname = abi::__cxa_demangle(typeid(obj).name(), 0, 0, &status);
 			str = realname;
 			free(realname);
-			
+
 			//remove std::
 			if (str.size() >= 5 && str.substr(0, 5) == "std::")
 					str.erase(begin(str), begin(str)+5);
-			
-			//if it's a template, find < and cut everything behind it 
-			//if it's more than 13 characters, cut to 10 and set ".." at the end
+
+			//if it's a template, find < and cut everything behind it
 			auto it = str.find_first_of("<");
-			if (it != std::string::npos) { 
+			if (it != std::string::npos) {
 				str.erase(begin(str)+it, end(str));
 			}
 		} catch(...) {
@@ -150,7 +149,7 @@ std::string toString(const T& t)
 
 	for(const auto& val : t)
 		res += toString(val) + ", ";
-	
+
 	if (res.size() > 2)
 		res.erase(end(res)-2, end(res));
 	res += "}";
@@ -168,33 +167,45 @@ std::string toString(const T& t)
 }
 
 /** tuple **/
-/*
-template<typename Tuple, std::size_t remaining>
-std::string __tupleToString(const Tuple& t)
-{
-	std::string res = toString(std::get<std::tuple_size<Tuple>::value - remaining>(t));	
-	res += __tupleToString<Tuple, remaining-1>(t); 
-	return res;
-}
 
-template<typename Tuple, 0>
-std::string __tupleToString(const Tuple& t)
+template<typename Tuple, std::size_t total, std::size_t remaining = total>
+struct __tupleToString
 {
-	return "";	
-}
+    static
+    void tupleToString(const Tuple& t, std::string& res)
+    {
+        res += toString(std::get<total - remaining>(t));
+        res += ", ";
+        __tupleToString<Tuple, total, remaining-1>::tupleToString(t, res);
+    }
+};
+
+template<typename Tuple, std::size_t total>
+struct __tupleToString<Tuple, total, 1>
+{
+    static
+    void tupleToString(const Tuple& t, std::string& res)
+    {
+        res += toString(std::get<total - 1>(t));
+    }
+};
+
+template<typename Tuple, std::size_t total>
+struct __tupleToString<Tuple, total, 0>
+{
+    static
+    void tupleToString(const Tuple& t, std::string& res)
+    {}
+};
 
 template<typename ...Args>
 std::string toString(const std::tuple<Args...>& t)
 {
 	std::string res = "`";
-	for (int i = 0; i < std::tuple_size<t>::value; ++i)
-		res += toString(std::get<i>(t)) + ", ";
-
-	if (res.size() > 2)
-		res.erase(end(res)-2, end(res));
+	__tupleToString<decltype(t), std::tuple_size<std::remove_cv_t<std::remove_reference_t<decltype(t)>>>::value>::tupleToString(t, res);
 	res += "`";
-	return __tupleToString<decltype(t), std::tuple_size<t>::value>(t);
+	return res;
 }
-*/
+
 }
 }
