@@ -8,7 +8,7 @@ namespace ign {
 namespace log {
 
 ////////////////////////////////////////////
-// SFINAE test for toString
+// SFINAE tests
 ////////////////////////////////////////////
 template <typename T>
 class has_toString
@@ -22,6 +22,21 @@ class has_toString
 public:
 	enum { value = sizeof(test<T>(0)) == sizeof(char) };
 };
+
+/*
+template <typename T>
+class is_begin_defined
+{
+	typedef char one;
+	typedef long two;
+
+	template <typename C> static one test( decltype(begin(decltype(C)) ) ;
+	template <typename C> static two test(...);
+
+public:
+	enum { value = sizeof(test<T>(0)) == sizeof(char) };
+};
+*/
 
 ////////////////////////////////////////////
 // ToString
@@ -46,7 +61,7 @@ template<class T, std::enable_if_t<std::is_pointer<T>::value>* = nullptr>
 std::string toString(const T& t)
 {
 	std::stringstream ss;
-	ss << t;
+	ss << "ptr@" << t; 
 	return ss.str();
 }	
 
@@ -63,13 +78,18 @@ std::string toString(const T& t)
 	res += "]";	
 
 	return res; 
-}	
+}
+
+/** having a begin(class), end(class) defined **/
+
 
 /** Other **/
 template<class T, std::enable_if_t<std::is_class<T>::value && !has_toString<T>::value>* = nullptr>
 std::string toString(const T& t)
 {
-	return std::string("Class");
+	std::stringstream ss;
+	ss << "obj@" << &t;
+	return ss.str();
 }	
 
 }

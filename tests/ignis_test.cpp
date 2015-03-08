@@ -1,4 +1,4 @@
-#include "Ignis/log_system/ToString.h"
+#include "../log_system/ToString.h"
 #include <iostream>
 
 class hasToString
