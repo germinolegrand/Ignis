@@ -3,6 +3,8 @@
 #include <vector>
 #include <unordered_map>
 
+using namespace ign;
+
 class hasToString
 {
 	public:
@@ -28,13 +30,16 @@ int main()
 	hasToString test;	
 	testClass test2;
 
-	std::cout << ign::log::toString(test) << std::endl;
-	std::cout << ign::log::toString(40.1547f) << std::endl;
-	std::cout << ign::log::toString(test2) << std::endl;
-	std::cout << ign::log::toString(tab) << std::endl;
-	std::cout << ign::log::toString(tab_first) << std::endl;
-	std::cout << "test on std::vector : " << ign::log::toString(vect) << std::endl;
-	std::cout << "test on std::map : " << ign::log::toString(test_map) << std::endl;
-	//std::cout << "test on std::tuple : " << ignl::log::toString(test_tuple) << std::enl;
+	//tuple
+	auto test_tuple = std::make_tuple("test", 15, true, "tuple test ?");	
+
+	std::cout << log::toString(test) << std::endl;
+	std::cout << log::toString(40.1547f) << std::endl;
+	std::cout << log::toString(test2) << std::endl;
+	std::cout << log::toString(tab) << std::endl;
+	std::cout << log::toString(tab_first) << std::endl;
+	std::cout << log::toString(vect) << std::endl;
+	std::cout << log::toString(test_map) << std::endl;
+	std::cout << log::toString(test_tuple) << std::endl;
 	return 0;
 }

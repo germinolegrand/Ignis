@@ -3,6 +3,9 @@
 #include <string>
 #include <type_traits>
 #include <sstream>
+#include <tuple>
+#include <typeinfo>
+#include <cxxabi.h>
 
 namespace ign {
 namespace log {
@@ -35,6 +38,38 @@ class is_container
 public :
 	enum { value = (1 == sizeof test<T>(0)) };
 };
+
+////////////////////////////////////////////
+// Info
+////////////////////////////////////////////
+template<class T>
+std::string getName(const T& obj, bool getRealName = true)
+{
+	std::string str = "obj";
+	if (getRealName) {
+		try {
+			int status;
+			char *realname = abi::__cxa_demangle(typeid(obj).name(), 0, 0, &status);
+			str = realname;
+			free(realname);
+			
+			//remove std::
+			if (str.size() >= 5 && str.substr(0, 5) == "std::")
+					str.erase(begin(str), begin(str)+5);
+			
+			//if it's a template, find < and cut everything behind it 
+			//if it's more than 13 characters, cut to 10 and set ".." at the end
+			auto it = str.find_first_of("<");
+			if (it != std::string::npos) { 
+				str.erase(begin(str)+it, end(str));
+			}
+		} catch(...) {
+			str = "obj";
+		}
+	}
+
+	return str;
+}
 
 ////////////////////////////////////////////
 // ToString
@@ -73,7 +108,9 @@ template<class T, std::enable_if_t<std::is_pointer<T>::value>* = nullptr>
 std::string toString(const T& t)
 {
 	std::stringstream ss;
-	ss << "ptr@" << t;
+
+	ss << "@" << t;
+
 	return ss.str();
 }
 
@@ -86,9 +123,10 @@ std::string toString(const T& t)
 	for (const auto& elem : t)
 		res += toString(elem) + ", ";
 
-	res.erase(end(res)-2, end(res));
-
+	if (res.size() > 2)
+		res.erase(end(res)-2, end(res));
 	res += "]";
+
 	return res;
 }
 
@@ -103,12 +141,13 @@ std::string toString(const T& t)
 template<class T, typename std::enable_if<is_container<T>::value>::type* = nullptr>
 std::string toString(const T& t)
 {
-	std::string res = "{";
+	std::string res = getName(t) + "{";
 
 	for(const auto& val : t)
 		res += toString(val) + ", ";
 	
-	res.erase(end(res)-2, end(res));
+	if (res.size() > 2)
+		res.erase(end(res)-2, end(res));
 	res += "}";
 
 	return res;
@@ -119,9 +158,38 @@ template<class T, std::enable_if_t<std::is_class<T>::value && !has_toString<T>::
 std::string toString(const T& t)
 {
 	std::stringstream ss;
-	ss << "obj@" << &t;
+	ss << getName(t) << "@" << &t;
 	return ss.str();
 }
 
+/** tuple **/
+/*
+template<typename Tuple, std::size_t remaining>
+std::string __tupleToString(const Tuple& t)
+{
+	std::string res = toString(std::get<std::tuple_size<Tuple>::value - remaining>(t));	
+	res += __tupleToString<Tuple, remaining-1>(t); 
+	return res;
+}
+
+template<typename Tuple, 0>
+std::string __tupleToString(const Tuple& t)
+{
+	return "";	
+}
+
+template<typename ...Args>
+std::string toString(const std::tuple<Args...>& t)
+{
+	std::string res = "`";
+	for (int i = 0; i < std::tuple_size<t>::value; ++i)
+		res += toString(std::get<i>(t)) + ", ";
+
+	if (res.size() > 2)
+		res.erase(end(res)-2, end(res));
+	res += "`";
+	return __tupleToString<decltype(t), std::tuple_size<t>::value>(t);
+}
+*/
 }
 }
