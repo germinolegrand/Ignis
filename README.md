@@ -1,4 +1,4 @@
-# Ignis - C++14 Utils Library
+Ignis - C++14 Utils Library
 =============================
 
 Ignis is a simple to use C++ `Header-Only` Library
