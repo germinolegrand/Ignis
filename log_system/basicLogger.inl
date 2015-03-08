@@ -5,7 +5,7 @@ basicLogger& basicLogger::operator()(Args&&... args)
 
 	//if print_term is actived, print to terminal
 	if (print_term)
-		m_std_stream << m_buffer.back();
+		*m_std_stream << m_buffer.back();
 
 	//if buffer reached his capacity, forceWrite
 	if (m_buffer.size() >= getBufferCapacity())

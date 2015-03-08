@@ -17,9 +17,9 @@ public :
 	bool print_term = true; //if activated, will print in the terminal each time you call () operator
 	std::string prefix = "[log]";
 	std::string separator = " ";
-	std::ostream& m_std_stream = std::cout;
 
 protected :	
+	std::ostream* m_std_stream = &(std::cout);
 	std::string m_output_file; 
 	std::ofstream m_output_stream;
 	std::vector<std::string> m_buffer;
@@ -47,6 +47,10 @@ public :
 	//Output file
 	inline basicLogger& setOutputFile(const std::string& path, bool truncate = true);
 	inline std::string getOutputFile() const { return m_output_file; }
+
+	//standard stream
+	inline basicLogger& setStdStream(std::ostream& stream) { m_std_stream = &stream; return *this; }
+	inline std::ostream& getStdStream() { return *m_std_stream; };
 
 	//force write
 	basicLogger& forceWrite(); //force write to the outputFile
@@ -82,7 +86,6 @@ basicLogger& basicLogger::setBufferCapacity(std::size_t s)
 
 basicLogger& basicLogger::forceWrite() 
 {
-	std::cout << "ForceWrite\n";
 	if (m_output_stream.is_open())
 	{
 		//build the text

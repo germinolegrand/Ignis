@@ -35,8 +35,10 @@ int main()
 	//tuple
 	auto test_tuple = std::make_tuple("test", 15, true, "tuple test ?");	
 
-	ign::log::basicLogger dbg(5);
+	ign::log::basicLogger dbg(5); //set buffer size
+	dbg.configure(true /*print in terminal*/, "[dbg]" /*prefix*/, " " /*separator*/, false /*print time*/);
 	dbg.setOutputFile("dbg.log");
+	dbg.setStdStream(std::cout);
 
 	dbg(test, 40.1547f, tab, tab_first, vect, test_map, test_tuple);
 
