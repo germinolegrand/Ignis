@@ -10,7 +10,7 @@
 namespace ign {
 namespace log {	
 
-class basicLogger {
+class Logger {
 	class BadOutputFile{}; //exception class
 public :
 	bool show_time = false; //if activated, will print the time of the log (since start of the program)
@@ -31,43 +31,43 @@ protected :
 	std::string write_arguments(const T& t) const;		
 
 public :
-	basicLogger(std::size_t buffer_size = 32);
-	~basicLogger();
+	Logger(std::size_t buffer_size = 32);
+	~Logger();
 	//() operator
 	template<typename ...Args>
-	basicLogger& operator()(Args&&... args);
+	Logger& operator()(Args&&... args);
 	
 	//configure
-	virtual basicLogger& configure(bool _print_term, const std::string& _prefix, const std::string& _separator, bool _print_time = false);
+	virtual Logger& configure(bool _print_term, const std::string& _prefix, const std::string& _separator, bool _print_time = false);
 	
 	//buffer size
-	basicLogger& setBufferCapacity(std::size_t s); //if write is activated, each time the buffer is full it will write it in the file
+	Logger& setBufferCapacity(std::size_t s); //if write is activated, each time the buffer is full it will write it in the file
 	inline std::size_t getBufferCapacity() const { return m_buffer.capacity(); }
 
 	//Output file
-	inline basicLogger& setOutputFile(const std::string& path, bool truncate = true);
+	inline Logger& setOutputFile(const std::string& path, bool truncate = true);
 	inline std::string getOutputFile() const { return m_output_file; }
 
 	//standard stream
-	inline basicLogger& setStdStream(std::ostream& stream) { m_std_stream = &stream; return *this; }
+	inline Logger& setStdStream(std::ostream& stream) { m_std_stream = &stream; return *this; }
 	inline std::ostream& getStdStream() { return *m_std_stream; };
 
 	//force write
-	basicLogger& forceWrite(); //force write to the outputFile
+	Logger& forceWrite(); //force write to the outputFile
 };
 
-basicLogger::basicLogger(std::size_t buffer_size)
+Logger::Logger(std::size_t buffer_size)
 {
 	m_buffer.reserve(buffer_size);
 }
 
-basicLogger::~basicLogger()
+Logger::~Logger()
 {
 	forceWrite();
 	m_output_stream.close();
 }
 
-basicLogger& basicLogger::setBufferCapacity(std::size_t s)
+Logger& Logger::setBufferCapacity(std::size_t s)
 {
 	if (s == getBufferCapacity())	
 		return *this;
@@ -84,7 +84,7 @@ basicLogger& basicLogger::setBufferCapacity(std::size_t s)
 	return *this;
 }
 
-basicLogger& basicLogger::forceWrite() 
+Logger& Logger::forceWrite() 
 {
 	if (m_output_stream.is_open())
 	{
@@ -103,7 +103,7 @@ basicLogger& basicLogger::forceWrite()
 	return *this;
 }
 
-#include "basicLogger.inl"
+#include "Logger.inl"
 
 }
 }

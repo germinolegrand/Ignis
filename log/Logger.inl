@@ -1,5 +1,5 @@
 template<typename ...Args>
-basicLogger& basicLogger::operator()(Args&&... args)
+Logger& Logger::operator()(Args&&... args)
 {
 	m_buffer.emplace_back(prefix + (show_time ? "[time]" : "") + separator + write_arguments(std::forward<Args>(args)...) + "\n"); 
 
@@ -15,18 +15,18 @@ basicLogger& basicLogger::operator()(Args&&... args)
 }
 
 template<class T>
-std::string basicLogger::write_arguments(const T& t) const	
+std::string Logger::write_arguments(const T& t) const	
 {
 	return toString(t);
 }
 
 template<class T, class ...Args>
-std::string basicLogger::write_arguments(const T& t, Args&&... args) const
+std::string Logger::write_arguments(const T& t, Args&&... args) const
 {
 	return std::string(toString(t) + separator + write_arguments(std::forward<Args>(args)...));
 }
 
-basicLogger& basicLogger::configure(bool _print_term, const std::string& _prefix, const std::string& _separator, bool _print_time)
+Logger& Logger::configure(bool _print_term, const std::string& _prefix, const std::string& _separator, bool _print_time)
 {
 	print_term = _print_term;
 	show_time = _print_time;
@@ -35,7 +35,7 @@ basicLogger& basicLogger::configure(bool _print_term, const std::string& _prefix
 	return *this;
 }
 
-inline basicLogger& basicLogger::setOutputFile(const std::string& path, bool truncate)
+inline Logger& Logger::setOutputFile(const std::string& path, bool truncate)
 {
 	//write what was logged for the previous file
 	forceWrite();

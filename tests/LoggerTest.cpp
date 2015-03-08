@@ -1,9 +1,9 @@
-#include "../log_system/basicLogger.h"
+#include "../log/Logger.h"
 #include <iostream>
 #include <vector>
 #include <unordered_map>
 
-//g++ -Wall -std=c++14 basicLoggerTest.cpp -o testBasicLogger
+//g++ -Wall -std=c++14 LoggerTest.cpp -o testLogger
 
 using namespace ign;
 
@@ -35,7 +35,7 @@ int main()
 	//tuple
 	auto test_tuple = std::make_tuple("test", 15, true, "tuple test ?");	
 
-	ign::log::basicLogger dbg(5); //set buffer size
+	ign::log::Logger dbg(5); //set buffer size
 	dbg.configure(true /*print in terminal*/, "[dbg]" /*prefix*/, " " /*separator*/, false /*print time*/);
 	dbg.setOutputFile("dbg.log");
 	dbg.setStdStream(std::cout);
