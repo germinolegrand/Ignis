@@ -18,6 +18,7 @@ class has_toString
 {
 	typedef char one;
 	typedef long two;
+
 	template <typename C> static one test( decltype(&C::toString) ) ;
 	template <typename C> static two test(...);
 public:
@@ -97,14 +98,14 @@ std::string toString(const T& t)
 template<class T, std::enable_if_t<std::is_same<T, bool>::value>* = nullptr>
 std::string toString(const T& t)
 {
-	return t ? std::string{"true"} : std::string{"false"};
+	return t ? "true" : "false";
 }
 
 /** pair **/
 template<class T, class U>
 std::string toString(const std::pair<T, U>& p)
 {
-	return std::string("<" + toString(p.first) + ":" + toString(p.second) + ">");
+	return "<" + toString(p.first) + ":" + toString(p.second) + ">";
 }
 
 /** pointer **/
@@ -129,9 +130,10 @@ std::string toString(const T& t)
 
 	if (res.size() > 2)
 		res.erase(end(res)-2, end(res));
+
 	res += "]";
 
-	return res;
+	return std::move(res);
 }
 
 /** has_toString **/
@@ -154,7 +156,7 @@ std::string toString(const T& t)
 		res.erase(end(res)-2, end(res));
 	res += "]";
 
-	return res;
+	return std::move(res);
 }
 
 /** Other **/
@@ -175,7 +177,7 @@ struct __tupleToString
     void tupleToString(const Tuple& t, std::string& res)
     {
         res += toString(std::get<total - remaining>(t));
-        res += ":";
+		res += ":";
         __tupleToString<Tuple, total, remaining-1>::tupleToString(t, res);
     }
 };
