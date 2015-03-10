@@ -164,7 +164,7 @@ template<class T, std::enable_if_t<std::is_class<T>::value && !has_toString<T>::
 std::string toString(const T& t)
 {
 	std::stringstream ss;
-	ss << getName(t) << "@" << &t;
+	ss << getName(t) << "(" << sizeof(t) <<")" << "@" << &t;
 	return ss.str();
 }
 
