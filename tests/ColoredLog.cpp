@@ -14,10 +14,9 @@ int main()
 	logger.cfg.configure("[test]", " - ");
 	logger.cfg.setStdOut(std::cout);
 
-	logger(logger.cfg);
-	logger(logger.style);
+	logger.style.setColors(log::Color::Red, log::Color::Black);
 
-	std::cout << "test" << std::endl;
-
+	logger("Text Rouge sur FOND NOIR");
+	logger(ign::os::osToString());
 	return 0;
 }

@@ -2,58 +2,67 @@
 
 #include <string>
 #include <iostream>
+#include "Color.h"
+#include "toString.h"
 
 namespace ign
 { namespace log {
 
-//Color is supported on windows mac and linux
-enum class Color : char {
-	Black = 0,
-	Red = 1,
-	Blue = 2,
-	Magenta = 3,
-	Green = 4,
-	Yellow = 5,
-	Cyan = 6,
-	White = 7,
-	DarkGrey = 8,
-	BrightRed = 9,
-	BrightBlue = 10,
-	BrightMagenta = 11,
-	BrightGreen = 12,
-	BrightYellow = 13,
-	BrightCyan = 14,
-	BrightGrey = 15
+struct Style {
+	Color fg = Color::Default;
+	Color bg = Color::Default;
+	bool reverse{false};
+
+	Style& setColors(const Color& foreground, const Color& background);
+	std::string apply(const std::string& s) const noexcept;
+	std::string toString() const noexcept;
+
+	static bool inTerminal() noexcept;
+private :
+	static bool _term;
+	static bool _checked;
 };
 
-std::string toString(const Color& c){
-	switch(c){
-		case Color::Black :
-			return "Black";
-		default :	
-			return "Unknown Color";
-	}
+bool Style::_term = false;
+bool Style::_checked = false;
+
+Style& Style::setColors(const Color& foreground, const Color& background) {
+	fg = foreground;
+	bg = background;
+	return *this;	
 }
 
-struct Style {
-	Color fg_color = Color::White;
-	Color bg_color = Color::Black;
-	bool reverse_colors{false};
-
-	std::string apply(const std::string& s) const noexcept;
-
-	std::string toString() const noexcept {
-		return "Style fg[" + log::toString(fg_color) + "] bg[" + 
-				log::toString(bg_color) + "]" + (reverse_colors ? " Reverse Colors" : ""); 
-	}
-};
-
 std::string Style::apply(const std::string& s) const noexcept {
-	//TODO Apply style depending on the platform
-	//on UNIX use ANSI escape code (http://en.wikipedia.org/wiki/ANSI_escape_code#graphics)
-	std::string fgcode = "\e[31;1m";
-	std::string bgcode = "";
-	return bgcode + fgcode + s + "\e[0m"; //the last escape code resets all attributes 
+	if (!inTerminal())
+		return s;
+#ifdef IGN_OS_UNIX
+	//ANSI escape code (http://en.wikipedia.org/wiki/ANSI_escape_code#graphics)
+	return "\033[0" + ANSIEscapeCode(bg, true) + ";" + ANSIEscapeCode(fg) + "m" + s + "\033[0m"; 
+#else 
+#ifdef IGN_OS_WIN
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), getWindowsColor(fg) | getWindowsColor(bg, true));
+	return s;
+#endif	
+#endif
+}
+
+std::string Style::toString() const noexcept {
+	return "Style fg[" + log::toString(fg) + "] bg[" + 
+			log::toString(bg) + "]" + (reverse? " Reverse Colors" : ""); 
+}
+
+bool Style::inTerminal() noexcept {
+	if (!_checked) {
+		_checked = true;
+#ifdef IGN_OS_UNIX
+		_term = isatty(fileno(stdout));
+#else 	
+#ifdef IGN_OS_WIN
+		_term = _isatty(_fileno(stdout));
+#endif
+#endif
+	}
+	return _term;
 }
 
 } //log

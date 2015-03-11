@@ -1,11 +1,11 @@
 template<typename ...Args>
 Logger& Logger::operator()(Args&&... args)
 {
-	m_buffer.emplace_back(cfg.getHeader() + write_arguments(std::forward<Args>(args)...) + "\n"); 
+	m_buffer.emplace_back(cfg.getHeader() + write_arguments(std::forward<Args>(args)...)); 
 
 	//if print_term is actived, print to terminal
 	if (cfg.mode & Config::W_TERM)
-		cfg.stream() << style.apply(m_buffer.back());
+		cfg.stream() << style.apply(m_buffer.back()) + "\n";
 
 	//if buffer reached his capacity, forceWrite
 	if (m_buffer.size() >= getBufferCapacity())
