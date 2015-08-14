@@ -1,11 +1,11 @@
 template<typename ...Args>
 Logger& Logger::operator()(Args&&... args)
 {
-	m_buffer.emplace_back(prefix + (show_time ? "[time]" : "") + separator + write_arguments(std::forward<Args>(args)...) + "\n"); 
+	m_buffer.emplace_back(cfg.getHeader() + write_arguments(std::forward<Args>(args)...)); 
 
 	//if print_term is actived, print to terminal
-	if (print_term)
-		*m_std_stream << m_buffer.back();
+	if (cfg.mode & Config::W_TERM)
+		cfg.stream() << style.apply(m_buffer.back()) + "\n";
 
 	//if buffer reached his capacity, forceWrite
 	if (m_buffer.size() >= getBufferCapacity())
@@ -23,18 +23,10 @@ std::string Logger::write_arguments(const T& t) const
 template<class T, class ...Args>
 std::string Logger::write_arguments(const T& t, Args&&... args) const
 {
-	return std::string(toString(t) + separator + write_arguments(std::forward<Args>(args)...));
+	return std::string(toString(t) + cfg.separator + write_arguments(std::forward<Args>(args)...));
 }
 
-Logger& Logger::configure(bool _print_term, const std::string& _prefix, const std::string& _separator, bool _print_time)
-{
-	print_term = _print_term;
-	show_time = _print_time;
-	prefix = _prefix;
-	separator = _separator;
-	return *this;
-}
-
+/*
 inline Logger& Logger::setOutputFile(const std::string& path, bool truncate)
 {
 	//write what was logged for the previous file
@@ -48,5 +40,6 @@ inline Logger& Logger::setOutputFile(const std::string& path, bool truncate)
 
 	return *this;
 }
+*/
 
 

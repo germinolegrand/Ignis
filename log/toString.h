@@ -18,6 +18,7 @@ class has_toString
 {
 	typedef char one;
 	typedef long two;
+
 	template <typename C> static one test( decltype(&C::toString) ) ;
 	template <typename C> static two test(...);
 public:
@@ -97,14 +98,14 @@ std::string toString(const T& t)
 template<class T, std::enable_if_t<std::is_same<T, bool>::value>* = nullptr>
 std::string toString(const T& t)
 {
-	return t ? std::string{"true"} : std::string{"false"};
+	return t ? "true" : "false";
 }
 
 /** pair **/
 template<class T, class U>
 std::string toString(const std::pair<T, U>& p)
 {
-	return std::string("`" + toString(p.first) + " : " + toString(p.second) + "`");
+	return "<" + toString(p.first) + ":" + toString(p.second) + ">";
 }
 
 /** pointer **/
@@ -122,16 +123,17 @@ std::string toString(const T& t)
 template<class T, std::enable_if_t<std::is_array<T>::value>* = nullptr>
 std::string toString(const T& t)
 {
-	std::string res = getName(t) + "[";
+	std::string res = "[";
 
 	for (const auto& elem : t)
 		res += toString(elem) + ", ";
 
 	if (res.size() > 2)
 		res.erase(end(res)-2, end(res));
+
 	res += "]";
 
-	return res;
+	return std::move(res);
 }
 
 /** has_toString **/
@@ -145,16 +147,16 @@ std::string toString(const T& t)
 template<class T, typename std::enable_if<is_container<T>::value>::type* = nullptr>
 std::string toString(const T& t)
 {
-	std::string res = getName(t) + "{";
+	std::string res = "[";
 
 	for(const auto& val : t)
 		res += toString(val) + ", ";
 
 	if (res.size() > 2)
 		res.erase(end(res)-2, end(res));
-	res += "}";
+	res += "]";
 
-	return res;
+	return std::move(res);
 }
 
 /** Other **/
@@ -162,7 +164,7 @@ template<class T, std::enable_if_t<std::is_class<T>::value && !has_toString<T>::
 std::string toString(const T& t)
 {
 	std::stringstream ss;
-	ss << getName(t) << "@" << &t;
+	ss << getName(t) << "(" << sizeof(t) <<")" << "@" << &t;
 	return ss.str();
 }
 
@@ -175,7 +177,7 @@ struct __tupleToString
     void tupleToString(const Tuple& t, std::string& res)
     {
         res += toString(std::get<total - remaining>(t));
-        res += ", ";
+		res += ":";
         __tupleToString<Tuple, total, remaining-1>::tupleToString(t, res);
     }
 };
@@ -201,9 +203,9 @@ struct __tupleToString<Tuple, total, 0>
 template<typename ...Args>
 std::string toString(const std::tuple<Args...>& t)
 {
-	std::string res = "`";
+	std::string res = "<";
 	__tupleToString<decltype(t), std::tuple_size<std::remove_cv_t<std::remove_reference_t<decltype(t)>>>::value>::tupleToString(t, res);
-	res += "`";
+	res += ">";
 	return res;
 }
 
